@@ -7,7 +7,18 @@ admin.site.register(TypeTireCategory)
 admin.site.register(GuaranteeCategory)
 admin.site.register(AdditionalServicesCategory)
 admin.site.register(GiftWrappingCategory)
-admin.site.register(TechniqueCategory)
+
+
+admin.site.register(ForWhomCategory)
+# admin.site.register(FormWhom)
+admin.site.register(TechnologyCategory)
+admin.site.register(SubItems)
+admin.site.register(CatalogCategory)
+admin.site.register(Addition)
+# admin.site.register(TitleProduct)
+
+
+
 admin.site.register(TypeCategory)
 admin.site.register(Category)
 admin.site.register(WhatsIncluded)

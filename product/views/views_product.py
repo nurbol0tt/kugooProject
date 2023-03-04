@@ -1,18 +1,10 @@
+from django.db.models import Min, OuterRef
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 
 from rest_framework.views import APIView
 
-from product.models import Product, Menu, Banner, TechniqueCategory, TypeCategory
 from product.serializers import *
-
-
-class ProductDetailView(APIView):
-
-    def get(self, request, pk):
-        product = get_object_or_404(Product, pk=pk)
-        serializers = ProductSerializer(product)
-        return Response(serializers.data)
 
 
 class MenuListView(APIView):
@@ -32,25 +24,43 @@ class BannerFilterHome(APIView):
         return Response(serializer.data)
 
 
-class TechnicListView(APIView):
-
-    def get(self, request):
-        queryset = TechniqueCategory.objects.all()
-        serializer = TechnicListSerializer(queryset, many=True)
-        return Response(serializer.data)
-
-
 class TypeCategoryList(APIView):
 
     def get(self, request):
-        queryset = TypeCategory.objects.all()
+        queryset = TypeCategory.objects.annotate(
+            min_price=models.Subquery(
+                Product.objects.filter(
+                    category__tech_category__title=OuterRef('title')
+                ).order_by('new_price').values('new_price')[:1]
+            )
+        )
         serializer = TypeCategorySerializer(queryset, many=True)
         return Response(serializer.data)
 
 
-class CartProductList(APIView):
+class CatalogCategoryListView(APIView):
+
+    def get(self, request):
+        queryset = CatalogCategory.objects.all()
+        serializer = CatalogCategoryListSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class ProductListView(APIView):
 
     def get(self, request):
         queryset = Product.objects.all()
-        serializer = CartProductSerializer(queryset, many=True)
+        serializer = ProductListSerializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class LikeView(APIView):
+
+    def post(self, request, pk):
+        post = get_object_or_404(Product, pk=pk)
+        if post.likes.filter(id=request.user.id).exists():
+            post.likes.remove(request.user)
+        else:
+            post.likes.add(request.user)
+        return Response(status=200)
+

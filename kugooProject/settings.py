@@ -39,8 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
+    'drf_yasg',
 
     'product',
+    'blogpost',
 ]
 
 MIDDLEWARE = [
@@ -59,11 +61,15 @@ CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
-    "http://localhost:3001",
+    "http://localhost:3000",
+    "http://localhost:3002",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://192.168.0.103:3001",
-
+    "https://a398-91-205-48-98.eu.ngrok.io",
+    "https://d753-91-205-48-98.eu.ngrok.io",
+    "http://91.205.48.98",
+    "https://93a9-91-205-48-98.eu.ngrok.io"
 ]
 
 # CORS_ORIGIN_ALLOW_ALL = True

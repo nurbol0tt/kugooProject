@@ -27,9 +27,6 @@ class GuaranteeCategory(models.Model):
         null=True
     )
 
-    def __str__(self):
-        return self.title
-
 
 class MediaBanner(models.Model):
     image = models.ImageField()
@@ -76,7 +73,7 @@ class GiftWrappingCategory(models.Model):
         return datetime.now() > self.expires_at
 
 
-class TechniqueCategory(models.Model):
+class TypeCategory(models.Model):
     title = models.CharField(max_length=125)
     image = models.ImageField(null=True, blank=True)
 
@@ -84,26 +81,56 @@ class TechniqueCategory(models.Model):
         return self.title
 
 
-class TypeCategory(models.Model):
-    title = models.CharField(max_length=125)
-    image = models.ImageField(null=True, blank=True)
-
-
 class Color(models.Model):
     name = models.CharField(max_length=50)
     hex = models.CharField(max_length=7)
 
+    def __str__(self):
+        return self.name
+
+
+class ForWhomCategory(models.Model):
+    title = models.CharField(max_length=55)
+
+    def __str__(self):
+        return self.title
+
+
+class TechnologyCategory(models.Model):
+    titleType = models.CharField(max_length=55)
+
+    def __str__(self):
+        return self.titleType
+
+
+class SubItems(models.Model):
+    titleType = models.ForeignKey(
+        TechnologyCategory,
+        on_delete=models.SET_NULL,
+        null=True
+
+    )
+    subItems = models.ManyToManyField(
+        ForWhomCategory,
+        related_name='form_whom_list'
+    )
+
+
+class CatalogCategory(models.Model):
+    title = models.ForeignKey(
+        TypeCategory,
+        on_delete=models.SET_NULL,
+        null=True
+    )
+    subItems = models.ManyToManyField(
+        SubItems
+    )
+
 
 # Final
 class Category(models.Model):
-    # equipment_category = models.ForeignKey(
-    #     EquipmentCategory,
-    #     on_delete=models.SET_NULL,
-    #     null=True
-    # )
-    type_tire = models.ForeignKey(
-        TypeTireCategory,
-        on_delete=models.SET_NULL,
+    feature = models.ManyToManyField(
+        'KeyFeatures',
         null=True
     )
     guarantee = models.ForeignKey(
@@ -121,20 +148,38 @@ class Category(models.Model):
         on_delete=models.SET_NULL,
         null=True
     )
-    technique_category = models.ForeignKey(
-        TechniqueCategory,
+    tech_category = models.ForeignKey(
+        TypeCategory,
         on_delete=models.SET_NULL,
         null=True
     )
-    type_category = models.ManyToManyField(
-        TypeCategory,
-        related_name="product_type_category"
-
+    catalog_category = models.ForeignKey(
+        TechnologyCategory,
+        # 'TitleProduct'
+        on_delete=models.SET_NULL,
+        null=True
     )
+    status = models.ManyToManyField(
+        ForWhomCategory,
+        related_name="product_type_category"
+    )
+
+
+class Addition(models.Model):
+    subItem = models.CharField(max_length=55)
+
+    def __str__(self):
+        return self.subItem
 
 
 class Menu(models.Model):
     title = models.CharField(max_length=55)
+    subItem = models.ForeignKey(
+        Addition,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         return self.title
@@ -142,6 +187,9 @@ class Menu(models.Model):
 
 class WhatsIncluded(models.Model):
     title = models.CharField(max_length=55)
+
+    def __str__(self):
+        return self.title
 
 
 class KeyFeatures(models.Model):
@@ -180,9 +228,6 @@ class ValueCharacter(models.Model):
         on_delete=models.SET_NULL,
         null=True
     )
-
-    def __str__(self):
-        return self.description, "---", self.key_features.title
 
 
 # Final
@@ -253,29 +298,22 @@ class Comment(models.Model):
         null=True,
         related_name="reviews"
     )
-    date_created = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(
+        auto_now_add=True
+    )
 
-    def __str__(self):
-        return f"{self.username} - {self.product}"
+    # def __str__(self):
+    #     return f"{self.username} - {self.product}"
 
 
 class Product(models.Model):
     title = models.CharField(max_length=255)
-    image = models.ForeignKey(
+    image = models.ManyToManyField(
         Media,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="product_image"
+        blank=True,
     )
     about_product = models.ForeignKey(
         AboutProduct,
-        on_delete=models.SET_NULL,
-        null=True
-    )
-    old_price = models.IntegerField(default=0)
-    new_price = models.IntegerField(default=0)
-    character = models.ForeignKey(
-        ValueCharacter,
         on_delete=models.SET_NULL,
         null=True
     )
@@ -284,15 +322,24 @@ class Product(models.Model):
         on_delete=models.SET_NULL,
         null=True
     )
+    old_price = models.IntegerField(default=0)
+    new_price = models.IntegerField(default=0)
+    character = models.ManyToManyField(
+        ValueCharacter,
+        blank=True
+    )
+    status = models.ManyToManyField(
+        Status,
+        blank=True
+    )
     deliver_payment = models.ForeignKey(
         DeliveryPayment,
         on_delete=models.SET_NULL,
         null=True
     )
-    warranty = models.ForeignKey(
+    warranty = models.ManyToManyField(
         Warranty,
-        on_delete=models.SET_NULL,
-        null=True
+        blank=True
     )
     version_max = models.ForeignKey(
         VersionMax,
@@ -321,6 +368,12 @@ class Product(models.Model):
     )
     views = models.IntegerField(default=0)
 
+    def total_likes(self):
+        return self.likes.count()
+
+    def __str__(self):
+        return self.title
+
 
 class Banner(models.Model):
     title = models.CharField(max_length=125)
@@ -342,6 +395,3 @@ class Banner(models.Model):
         null=True,
         related_name="banner_place_category"
     )
-
-    # def __str__(self):
-    #     return f"{self.title}, {self.status_category.title}"
