@@ -1,6 +1,9 @@
 from django.contrib import admin
 
-from product.models import *
+from product.models.product_models import *
+from product.models.misc_models import *
+from product.models.category_models import *
+
 
 admin.site.register(EquipmentCategory)
 admin.site.register(TypeTireCategory)
@@ -10,13 +13,10 @@ admin.site.register(GiftWrappingCategory)
 
 
 admin.site.register(ForWhomCategory)
-# admin.site.register(FormWhom)
 admin.site.register(TechnologyCategory)
 admin.site.register(SubItems)
 admin.site.register(CatalogCategory)
 admin.site.register(Addition)
-# admin.site.register(TitleProduct)
-
 
 
 admin.site.register(TypeCategory)

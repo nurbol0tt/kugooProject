@@ -4,6 +4,8 @@ from rest_framework.response import Response
 
 from rest_framework.views import APIView
 
+from product.models.misc_models import CatalogCategory, TypeCategory, Banner, Menu
+from product.models.product_models import Product
 from product.serializers import *
 
 

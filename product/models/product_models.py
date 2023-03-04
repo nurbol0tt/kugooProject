@@ -2,21 +2,8 @@ from django.contrib.auth.models import User
 from django.db import models
 from datetime import datetime, timedelta
 
-
-class EquipmentCategory(models.Model):
-    title = models.CharField(max_length=55)
-    image = models.ImageField(blank=True)
-
-    def __str__(self):
-        return self.title
-
-
-class TypeTireCategory(models.Model):
-    title = models.CharField(max_length=55)
-    image = models.ImageField(blank=True)
-
-    def __str__(self):
-        return self.title
+from product.models.category_models import Status
+from product.models.misc_models import TypeCategory, TechnologyCategory, ForWhomCategory
 
 
 class GuaranteeCategory(models.Model):
@@ -26,24 +13,6 @@ class GuaranteeCategory(models.Model):
         blank=True,
         null=True
     )
-
-
-class MediaBanner(models.Model):
-    image = models.ImageField()
-
-
-class Status(models.Model):
-    title = models.CharField(max_length=125)
-
-    def __str__(self):
-        return self.title
-
-
-class PlaceCategory(models.Model):
-    title = models.CharField(max_length=55)
-
-    def __str__(self):
-        return self.title
 
 
 class AdditionalServicesCategory(models.Model):
@@ -73,14 +42,6 @@ class GiftWrappingCategory(models.Model):
         return datetime.now() > self.expires_at
 
 
-class TypeCategory(models.Model):
-    title = models.CharField(max_length=125)
-    image = models.ImageField(null=True, blank=True)
-
-    def __str__(self):
-        return self.title
-
-
 class Color(models.Model):
     name = models.CharField(max_length=50)
     hex = models.CharField(max_length=7)
@@ -89,45 +50,6 @@ class Color(models.Model):
         return self.name
 
 
-class ForWhomCategory(models.Model):
-    title = models.CharField(max_length=55)
-
-    def __str__(self):
-        return self.title
-
-
-class TechnologyCategory(models.Model):
-    titleType = models.CharField(max_length=55)
-
-    def __str__(self):
-        return self.titleType
-
-
-class SubItems(models.Model):
-    titleType = models.ForeignKey(
-        TechnologyCategory,
-        on_delete=models.SET_NULL,
-        null=True
-
-    )
-    subItems = models.ManyToManyField(
-        ForWhomCategory,
-        related_name='form_whom_list'
-    )
-
-
-class CatalogCategory(models.Model):
-    title = models.ForeignKey(
-        TypeCategory,
-        on_delete=models.SET_NULL,
-        null=True
-    )
-    subItems = models.ManyToManyField(
-        SubItems
-    )
-
-
-# Final
 class Category(models.Model):
     feature = models.ManyToManyField(
         'KeyFeatures',
@@ -163,26 +85,6 @@ class Category(models.Model):
         ForWhomCategory,
         related_name="product_type_category"
     )
-
-
-class Addition(models.Model):
-    subItem = models.CharField(max_length=55)
-
-    def __str__(self):
-        return self.subItem
-
-
-class Menu(models.Model):
-    title = models.CharField(max_length=55)
-    subItem = models.ForeignKey(
-        Addition,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-
-    def __str__(self):
-        return self.title
 
 
 class WhatsIncluded(models.Model):
@@ -373,25 +275,3 @@ class Product(models.Model):
 
     def __str__(self):
         return self.title
-
-
-class Banner(models.Model):
-    title = models.CharField(max_length=125)
-    image = models.ManyToManyField(
-        MediaBanner,
-        related_name="product_image"
-    )
-    status_category = models.ForeignKey(
-        Status,
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        related_name="banner_status_category"
-    )
-    place_category = models.ForeignKey(
-        PlaceCategory,
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        related_name="banner_place_category"
-    )
